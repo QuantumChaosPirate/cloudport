@@ -43,6 +43,7 @@ resource "azurerm_public_ip" "main" {
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
   allocation_method   = "Static"
+  sku = "Standard"
 }
 
 #The Azure firewall which will dictate what goes through and how
@@ -127,7 +128,7 @@ resource "azurerm_linux_virtual_machine" "main" {
 
   admin_ssh_key {
     username   = var.admin_username
-    public_key = file("~/.ssh/id_ed25519.pub")
+    public_key = file("~/.ssh/id_rsa_cloudport.pub")
   }
 
   os_disk {

@@ -1,0 +1,7 @@
+#This is the template file which other users can copy and fill in using your own installs for their installation
+subscription_id = "your-azure-subscription-id"
+admin_username  = "cloudport"
+location        = "westeurope"
+project_name    = "cloudport"
+environment     = "dev"
+vm_size         = "Standard_B1s"

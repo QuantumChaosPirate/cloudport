@@ -223,3 +223,7 @@ __marimo__/
 infra/terraform.tfvars
 
 **/.terraform/
+
+infra/terraform.tfstate
+infra/terraform.tfstate.backup
+infra/.terraform/

@@ -222,3 +222,4 @@ __marimo__/
 #Added access to other files
 infra/terraform.tfvars
 
+**/.terraform/

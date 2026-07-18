@@ -13,6 +13,9 @@ class Settings(BaseSettings):
     quarantine_container_name: str = "quarantine"
     production_container_name: str = "production"
     
+    #The database access
+    database_url: str
+
     #API settings: Metadata about the APU
     api_title: str = "CloudPort API"
     api_version: str = "0.1.0"
@@ -27,3 +30,4 @@ class Settings(BaseSettings):
 
 #Creates an instance of the Settings class that the entire app imports & uses, a single point of truth for all configuration
 settings = Settings()
+

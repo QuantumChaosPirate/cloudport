@@ -1,0 +1,17 @@
+#FastAPI is the web framework used for building our API with
+fastapi==0.111.0
+
+#uvicorn is the server which actually runs FastAPI 
+uvicorn==0.30.1
+
+#pydantic is used for handling data validation, checking requests and responses for their format and types
+pydantic==2.7.4
+
+#the pydantic extension used for handling loading settings from env vars and .env files
+pydantic-settings==2.3.4
+
+#Official python library for interacting with Azure's Blob storage,used for generating presigned URLs
+azure-storage-blob==12.20.0
+
+#Used for allowing FastAPI to handle file uploads in requests
+python-multipart==0.0.9

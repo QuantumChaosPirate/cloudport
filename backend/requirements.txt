@@ -41,3 +41,6 @@ bcrypt==4.1.3
 #The library that creates and validates JWT tokens.
 #JOSE (JavaScript Object Signing and Encryption) handles generating the token when someone logs in and verifying it on every subsequent request.
 python-jose==3.3.0
+
+#The email validator package to check email inputs and checks if they are valid
+email-validator==2.1.1

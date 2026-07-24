@@ -3,8 +3,8 @@ from fastapi import FastAPI
 #Imports our settings object so we can use the API title and version which was defined in config.py
 from app.config import settings
 #Imports both routers we just built. This is how main.py knows about all the routes defined in the other files.
-#Note: imported the auth to be accessed
-from app.routers import storage, health, auth
+#Note: imported the auth & users to be accessed
+from app.routers import storage, health, auth, users
 
 #Creates the FastAPI application instance.
 #The title, version, and description show up in the auto-generated API documentation at /docs
@@ -22,6 +22,8 @@ app.include_router(health.router)
 app.include_router(storage.router)
 #The auth router
 app.include_router(auth.router)
+#The user settings router
+app.include_router(users.router)
 
 #A simple landing page for the API.
 #When someone visits the root URL / they get a welcome message and a pointer to /docs where the full API documentation lives.

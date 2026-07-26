@@ -21,6 +21,13 @@ import uuid
 #logging which records errors to the log file so we can debug problems
 import logging
 
+#These import the 3 scanner functions which had been built, plus the authentication tools
+#and database session so the quotas and update usage can be checked
+from app.scanner import scan_blob, promote_to_production, delete_from_quarantine
+from app.auth import get_current_user
+from app.models.user import User
+from sqlalchemy.orm import Session
+from app.database import get_db
 
 #logger, which creates a logger named after this file, used to record errors
 logger = logging.getLogger(__name__)
@@ -123,3 +130,67 @@ async def generate_presigned_download_url(
         raise HTTPException(status_code=500, detail="Could not generate download URL")
 
     return {"download_url": download_url}
+
+################################################################ 
+@router.post("/scan/{object_key:path}")
+async def scan_and_promote(
+    object_key: str,
+    db: Session = Depends(get_db),
+    blob_client: BlobServiceClient = Depends(get_blob_service_client),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Called after a file has been uploaded to quarantine.
+    Scans the file with ClamAV and promotes to production if clean.
+    """
+    # Check user hasn't exceeded their storage quota
+    blob = blob_client.get_blob_client(
+        container=settings.quarantine_container_name,
+        blob=object_key
+    )
+
+    #Obtains the file size from Azure, then checks if adding this file would push the user over their quota
+    #If it does, the dile is deleted from quarantine and the request is rejected, then the error is deleted
+    #(The deletion must be first, as we shouldn't keep files longer than bare minimum)
+    blob_properties = blob.get_blob_properties()
+    file_size = blob_properties.size
+
+    if current_user.storage_used_bytes + file_size > current_user.storage_quota_bytes:
+        delete_from_quarantine(object_key, blob_client)
+        raise HTTPException(
+            status_code=400,
+            detail="Storage quota exceeded. File rejected."
+        )
+
+    # Check if upload approval is required for this user, it's for the parental control gate
+    #Function is ran if the user account is of 'child' priveleges, the file stuck in quarantine until Admin or Owner approval
+    if current_user.requires_upload_approval:
+        raise HTTPException(
+            status_code=403,
+            detail="Your uploads require admin approval before processing."
+        )
+
+    # Scans the file, by calling scan_blob(), if file is infected then it's removed from quarantine
+    #and a clear error message is returned to the user
+    is_clean = scan_blob(object_key, blob_client)
+
+    if not is_clean:
+        delete_from_quarantine(object_key, blob_client)
+        raise HTTPException(
+            status_code=400,
+            detail="File failed malware scan and has been rejected."
+        )
+
+    # Promote to production if the file passes all the checks
+    promote_to_production(object_key, blob_client)
+
+    # Update user's storage usage in database to reflect the new usage, keeps storage dashboard accurate
+    current_user.storage_used_bytes += file_size
+    db.commit()
+
+    #Success message is returned, with the file key and size. Frontend uses object_key to generate a download URL later
+    return {
+        "message": "File scanned and uploaded successfully",
+        "object_key": object_key,
+        "file_size": file_size
+    }

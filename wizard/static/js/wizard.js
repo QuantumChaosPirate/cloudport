@@ -1,7 +1,7 @@
 // ── State ──────────────────────────────────────────────────────────────────
 // Tracks the current step and selected storage size
 let currentStep = 1;
-const totalSteps = 5;
+const totalSteps = 6;
 let selectedStorageBytes = null;
 
 // ── Step Navigation ────────────────────────────────────────────────────────
@@ -43,7 +43,7 @@ function goToStep(stepNumber) {
 function validateStep(step) {
     hideError();
 
-    if (step === 2) {
+    if (step === 3) {
         const domain = document.getElementById('domain').value.trim();
         const email = document.getElementById('email').value.trim();
 
@@ -57,14 +57,14 @@ function validateStep(step) {
         }
     }
 
-    if (step === 3) {
+    if (step === 4) {
         if (!selectedStorageBytes) {
             showError('Please select a storage plan.');
             return false;
         }
     }
 
-    if (step === 4) {
+    if (step === 5) {
         const username = document.getElementById('username').value.trim();
         const email = document.getElementById('owner-email').value.trim();
         const password = document.getElementById('password').value;
@@ -113,9 +113,12 @@ function selectStorage(element, bytes) {
 
 // Collect all form data and send to the FastAPI backend
 async function submitSetup() {
-    if (!validateStep(4)) return;
+    if (!validateStep(5)) return;
 
     const setupData = {
+        const setupData = {
+        azure_account_name: document.getElementById('azure-account-name').value.trim(),
+        azure_connection_string: document.getElementById('azure-connection-string').value.trim(),
         domain: document.getElementById('domain').value.trim(),
         email: document.getElementById('email').value.trim(),
         storage_quota_bytes: selectedStorageBytes,

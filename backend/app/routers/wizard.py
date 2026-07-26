@@ -19,6 +19,8 @@ router = APIRouter(prefix="/wizard", tags=["wizard"])
 #Pydantic validates all fields automatically, if anything is missing or wron type,
 #FastAPI rejects the request before it reaches our code
 class SetupRequest(BaseModel):
+    azure_account_name: str
+    azure_connection_string: str
     domain: str
     email: EmailStr
     storage_quota_bytes: int
@@ -88,6 +90,26 @@ async def run_setup(request: SetupRequest, db: Session = Depends(get_db)):
         "JELLYFIN_ADMIN_USERNAME": request.username,
         "JELLYFIN_ADMIN_PASSWORD": request.jellyfin_password,
     })
+    # Write Azure credentials to .env file
+    env_path = "../.env"
+    with open(env_path, "r") as f:
+        env_content = f.read()
+
+    env_content = env_content.replace(
+        "AZURE_STORAGE_CONNECTION_STRING=your-azure-storage-connection-string",
+        f"AZURE_STORAGE_CONNECTION_STRING={request.azure_connection_string}"
+    )
+    env_content = env_content.replace(
+        "AZURE_STORAGE_ACCOUNT_NAME=your-storage-account-name",
+        f"AZURE_STORAGE_ACCOUNT_NAME={request.azure_account_name}"
+    )
+    env_content = env_content.replace(
+        "DOMAIN=yourdomain.com",
+        f"DOMAIN={request.domain}"
+    )
+
+    with open(env_path, "w") as f:
+        f.write(env_content)
 
     # Mark CloudPort as configured, blocks the wizard to run again permanently
     os.makedirs("../config", exist_ok=True)

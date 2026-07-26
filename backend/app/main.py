@@ -40,16 +40,12 @@ app.include_router(files.router)
 app.include_router(dashboard.router)
 
 
-#A simple landing page for the API.
-#When someone visits the root URL / they get a welcome message and a pointer to /docs where the full API documentation lives.
-#FastAPI generates that documentation automatically from the code.
+#This will send the user directly to the login dashboard of the cloudport instance
+from fastapi.responses import RedirectResponse
+
 @app.get("/")
 async def root():
-    return {
-        "message": "Welcome to CloudPort API",
-        "version": settings.api_version,
-        "docs": "/docs"
-    }
+    return RedirectResponse(url="/dashboard/")
 
 # Expose /metrics endpoint for Prometheus to scrape
 Instrumentator().instrument(app).expose(app)

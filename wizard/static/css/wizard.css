@@ -1,0 +1,258 @@
+/* ── Reset & Base ─────────────────────────────────────────────────────────── */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #0f0f13;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #e0e0e0;
+}
+
+/* ── Wizard Container ─────────────────────────────────────────────────────── */
+.wizard-container {
+    background: #1a1a2e;
+    border-radius: 12px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    padding: 40px;
+    width: 100%;
+    max-width: 560px;
+}
+
+/* ── Header ───────────────────────────────────────────────────────────────── */
+.wizard-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.wizard-header h1 {
+    font-size: 28px;
+    color: #ffffff;
+}
+
+.wizard-header p {
+    color: #666;
+    margin-top: 4px;
+}
+
+/* ── Progress Bar ─────────────────────────────────────────────────────────── */
+.progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.progress-step {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    color: #999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+}
+
+.progress-step.active {
+    background: #4f46e5;
+    color: white;
+}
+
+.progress-step.completed {
+    background: #22c55e;
+    color: white;
+}
+
+.progress-line {
+    flex: 1;
+    height: 2px;
+    background: #e0e0e0;
+    max-width: 60px;
+}
+
+/* ── Wizard Steps ─────────────────────────────────────────────────────────── */
+/* Hide all steps by default */
+.wizard-step {
+    display: none;
+}
+
+/* Only show the active step */
+.wizard-step.active {
+    display: block;
+}
+
+.wizard-step h2 {
+    font-size: 22px;
+    color: #ffffff;
+    margin-bottom: 12px;
+}
+
+.wizard-step p {
+    color: #a0a0b0;
+    margin-bottom: 16px;
+    line-height: 1.6;
+}
+
+.wizard-step ul {
+    list-style: none;
+    margin-bottom: 24px;
+}
+
+.wizard-step ul li {
+    padding: 6px 0;
+    color: #a0a0b0;
+}
+
+/* ── Form Elements ────────────────────────────────────────────────────────── */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #e0e0e0;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #2e2e4e;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border-color 0.2s;
+    outline: none;
+    background: #0f0f1a;
+    color: #e0e0e0;
+}
+
+.form-group input:focus {
+    border-color: #4f46e5;
+}
+
+.form-group small {
+    display: block;
+    color: #666;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+/* ── Storage Options ──────────────────────────────────────────────────────── */
+.storage-options {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.storage-option {
+    flex: 1;
+    border: 2px solid #2e2e4e;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #0f0f1a;
+}
+
+.storage-option:hover {
+    border-color: #4f46e5;
+}
+
+.storage-option.selected {
+    border-color: #4f46e5;
+    background: #1a1a3e;
+}
+
+.storage-option h3 {
+    font-size: 18px;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.storage-option p {
+    color: #4f46e5;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.storage-option small {
+    color: #888;
+    font-size: 12px;
+}
+
+/* ── Buttons ──────────────────────────────────────────────────────────────── */
+.button-group {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 24px;
+}
+
+.btn-primary {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-decoration: none;
+}
+
+.btn-primary:hover {
+    background: #4338ca;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #4f46e5;
+    border: 2px solid #4f46e5;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.btn-secondary:hover {
+    background: #1a1a3e;
+}
+
+/* ── Success Links ────────────────────────────────────────────────────────── */
+.success-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+/* ── Error Box ────────────────────────────────────────────────────────────── */
+.error-box {
+    background: #fef2f2;
+    border: 1px solid #fca5a5;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 16px;
+}
+
+.error-box p {
+    color: #dc2626;
+    font-size: 14px;
+    margin: 0;
+}

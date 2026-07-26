@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudPort</title>
+    <link rel="stylesheet" href="/dashboard/static/css/dashboard.css">
+</head>
+<body>
+
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-container">
+            <h1>CloudPort</h1>
+            <p>Sign in to your personal cloud</p>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="login-username" placeholder="Enter your username">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="login-password" placeholder="Enter your password">
+            </div>
+            <button class="btn-primary" id="login-btn">Sign In</button>
+            <div class="error-box" id="login-error" style="display:none;">
+                <p id="login-error-message"></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div id="dashboard" style="display:none;">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h2>CloudPort</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="showSection('home')">
+                    <span class="nav-icon">⊞</span> Home
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('files')">
+                    <span class="nav-icon">⊟</span> Files
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('users')" id="nav-users">
+                    <span class="nav-icon">⊠</span> Users
+                </a>
+                <a href="#" class="nav-item" onclick="showSection('approvals')" id="nav-approvals">
+                    <span class="nav-icon">⊡</span> Approvals
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <p id="sidebar-username">Loading...</p>
+                    <p id="sidebar-role" class="role-badge">...</p>
+                </div>
+                <button class="btn-logout" onclick="logout()">Sign Out</button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Home Section -->
+            <div class="section active" id="section-home">
+                <h1>Home</h1>
+
+                <!-- Storage Overview -->
+                <div class="card">
+                    <h3>Storage Usage</h3>
+                    <div class="storage-bar-container">
+                        <div class="storage-bar" id="storage-bar"></div>
+                    </div>
+                    <p id="storage-text">Loading...</p>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="card">
+                    <h3>Services</h3>
+                    <div class="service-links">
+                        <a href="/media" target="_blank" class="service-card">
+                            <h4>Jellyfin</h4>
+                            <p>Media Server</p>
+                        </a>
+                        <a href="/notes" target="_blank" class="service-card">
+                            <h4>Outline</h4>
+                            <p>Notes</p>
+                        </a>
+                        <a href="/monitoring" target="_blank" class="service-card" id="link-monitoring">
+                            <h4>Grafana</h4>
+                            <p>Monitoring</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- System Health -->
+                <div class="card">
+                    <h3>System Health</h3>
+                    <div class="health-status">
+                        <div class="health-item">
+                            <span class="health-dot green"></span>
+                            <span>API</span>
+                            <span id="health-api">Checking...</span>
+                        </div>
+                        <div class="health-item">
+                            <span class="health-dot" id="health-dot-db"></span>
+                            <span>Database</span>
+                            <span id="health-db">Checking...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Section -->
+            <div class="section" id="section-files">
+                <div class="section-header">
+                    <h1>Files</h1>
+                    <button class="btn-primary" onclick="showUploadModal()">Upload File</button>
+                </div>
+
+                <!-- File tabs -->
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('my-files')">My Files</button>
+                    <button class="tab" onclick="switchTab('shared-files')">Shared With Me</button>
+                </div>
+
+                <!-- My Files -->
+                <div class="tab-content active" id="tab-my-files">
+                    <div class="file-list" id="my-files-list">
+                        <p class="empty-state">No files yet. Upload your first file.</p>
+                    </div>
+                </div>
+
+                <!-- Shared Files -->
+                <div class="tab-content" id="tab-shared-files">
+                    <div class="file-list" id="shared-files-list">
+                        <p class="empty-state">No files shared with you yet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Section — Admin/Owner only -->
+            <div class="section" id="section-users">
+                <h1>Users</h1>
+                <div class="user-list" id="user-list">
+                    <p class="empty-state">Loading users...</p>
+                </div>
+            </div>
+
+            <!-- Approvals Section — Admin/Owner only -->
+            <div class="section" id="section-approvals">
+                <h1>Pending Approvals</h1>
+                <p>Files uploaded by child accounts waiting for your approval.</p>
+                <div class="file-list" id="approvals-list">
+                    <p class="empty-state">No pending approvals.</p>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal" id="upload-modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Upload File</h3>
+            <div class="form-group">
+                <label>Select File</label>
+                <input type="file" id="upload-file-input">
+            </div>
+            <div class="progress-container" id="upload-progress-container" style="display:none;">
+                <div class="progress-bar-upload" id="upload-progress-bar"></div>
+                <p id="upload-progress-text">Uploading...</p>
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="closeUploadModal()">Cancel</button>
+                <button class="btn-primary" onclick="uploadFile()">Upload</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Modal -->
+    <div class="modal" id="share-modal" style="display:none;">
+        <div class="modal-content">
+            <h3>Share File</h3>
+            <div class="form-group">
+                <label>User ID to share with</label>
+                <input type="number" id="share-user-id" placeholder="Enter user ID">
+            </div>
+            <div class="form-group">
+                <label>Permission</label>
+                <select id="share-permission">
+                    <option value="read">Read only</option>
+                    <option value="write">Read and write</option>
+                </select>
+            </div>
+            <div class="button-group">
+                <button class="btn-secondary" onclick="closeShareModal()">Cancel</button>
+                <button class="btn-primary" onclick="shareFile()">Share</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/dashboard/static/js/app.js" defer></script>
+</body>
+</html>

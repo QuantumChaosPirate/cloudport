@@ -1,3 +1,5 @@
+#Imports the prometheus instrumentator needed for making the cost calculations
+from prometheus_fastapi_instrumentator import Instrumentator
 #Imports the main FastAPI class: this is what creates the actual application.
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
@@ -44,3 +46,6 @@ async def root():
         "version": settings.api_version,
         "docs": "/docs"
     }
+
+# Expose /metrics endpoint for Prometheus to scrape
+Instrumentator().instrument(app).expose(app)

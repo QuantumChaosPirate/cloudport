@@ -47,3 +47,6 @@ email-validator==2.1.1
 
 #The program "ClamAV", which is used for malware scans before fully allowing uploading to the project
 clamd==1.0.2
+
+#Promethus is the application used for calculations regarding Cost management
+prometheus-fastapi-instrumentator==6.1.0

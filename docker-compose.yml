@@ -90,8 +90,50 @@ services:
     depends_on:
       - cloudport-api
 
+# Prometheus metrics collection
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: cloudport-prometheus
+    volumes:
+      # Prometheus configuration
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      # Persist metrics data between restarts
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      # Keep 30 days of metrics history
+      - '--storage.tsdb.retention.time=30d'
+    restart: unless-stopped
+    depends_on:
+      - cloudport-api
+
+  # Grafana dashboard
+  grafana:
+    image: grafana/grafana:latest
+    container_name: cloudport-grafana
+    environment:
+      # Default admin credentials — changed during setup wizard
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-changethisbeforeproduction}
+      # Disable Grafana's own signup page
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      # Pre-built dashboard JSON
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
+      # Provisioning config — auto-loads datasource and dashboard
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      # Persist Grafana data between restarts
+      - grafana_data:/var/lib/grafana
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+
+
 # Named volumes for persistent data storage
 volumes:
   db_data:
   clamav_data:
   media_data:
+  prometheus_data:
+  grafana_data:

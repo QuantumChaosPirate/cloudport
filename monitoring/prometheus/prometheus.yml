@@ -1,0 +1,18 @@
+global:
+  # How often Prometheus scrapes metrics from targets, every 15s, it visits each target's
+  #/metrics endpoint and collects the current numbers
+  scrape_interval: 15s
+  # How often Prometheus evaluates alerting rules, every 15s, Prometheus chechs it's alerting rules
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Scrape metrics from the CloudPort FastAPI backend
+  - job_name: "cloudport-api"
+    static_configs:
+      - targets: ["cloudport-api:8000"]
+    metrics_path: "/metrics"
+
+  # Scrape Prometheus's own metrics
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]

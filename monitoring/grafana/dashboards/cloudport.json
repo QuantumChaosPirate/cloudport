@@ -1,0 +1,82 @@
+{
+  "title": "CloudPort Dashboard",
+  "uid": "cloudport-main",
+  "version": 1,
+  "schemaVersion": 38,
+  "panels": [
+    {
+      "id": 1,
+      "title": "Total HTTP Requests",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(http_requests_total{job='cloudport-api'})",
+          "legendFormat": "Total Requests"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Request Rate (per second)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 4 },
+      "targets": [
+        {
+          "expr": "rate(http_requests_total{job='cloudport-api'}[5m])",
+          "legendFormat": "Requests/sec"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Average Response Time (ms)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 4 },
+      "targets": [
+        {
+          "expr": "rate(http_request_duration_seconds_sum{job='cloudport-api'}[5m]) / rate(http_request_duration_seconds_count{job='cloudport-api'}[5m]) * 1000",
+          "legendFormat": "Avg Response Time"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Failed Requests (4xx/5xx)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(http_requests_total{job='cloudport-api', status=~'4..|5..'})",
+          "legendFormat": "Failed Requests"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Memory Usage (MB)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "process_resident_memory_bytes{job='cloudport-api'} / 1024 / 1024",
+          "legendFormat": "Memory MB"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "CPU Usage (seconds)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(process_cpu_seconds_total{job='cloudport-api'}[5m])",
+          "legendFormat": "CPU"
+        }
+      ]
+    }
+  ],
+  "time": { "from": "now-1h", "to": "now" },
+  "refresh": "30s"
+}

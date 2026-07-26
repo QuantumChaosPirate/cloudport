@@ -9,7 +9,7 @@ from alembic import context
 #Base: our SQLAlchemy base from database.py, this is how Alembic knows what tables exist
 from app.database import Base
 #user — imports our User model so Alembic can see the users table
-from app.models import user
+from app.models import user, file
 
 # Alembic config object, provides access to alembic.ini values
 config = context.config

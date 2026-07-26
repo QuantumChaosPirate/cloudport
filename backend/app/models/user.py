@@ -1,3 +1,5 @@
+#Imports the files.py relationship to the User model so the 2 models are properly linked
+from sqlalchemy.orm import relationship
 #Column, Integer, String, etc. — SQLAlchemy column types, each maps to a PostgreSQL data type
 from sqlalchemy import Column, Integer, String, Boolean, BigInteger, DateTime, Enum
 #func: SQLAlchemy's way of calling database functions like 'now()' for timestamps
@@ -50,3 +52,6 @@ class User(Base):
         #timezone=True — stores times in UTC, important for a platform that could have users across different timezones
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    #Relationship to files owned by this user
+    files = relationship("File", back_populates="owner")

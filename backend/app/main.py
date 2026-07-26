@@ -4,8 +4,8 @@ from fastapi.staticfiles import StaticFiles
 #Imports our settings object so we can use the API title and version which was defined in config.py
 from app.config import settings
 #Imports both routers we just built. This is how main.py knows about all the routes defined in the other files.
-#Note: imported the auth, users & wizard to be accessed
-from app.routers import storage, health, auth, users, wizard
+#Note: imported the auth, users, wizard & files to be accessed
+from app.routers import storage, health, auth, users, wizard, files
 
 #Creates the FastAPI application instance.
 #The title, version, and description show up in the auto-generated API documentation at /docs
@@ -30,6 +30,8 @@ app.include_router(auth.router)
 app.include_router(users.router)
 #The installation wizard router
 app.include_router(wizard.router)
+#The file approval system routher
+app.include_router(files.router)
 
 
 #A simple landing page for the API.

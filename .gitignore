@@ -230,3 +230,5 @@ infra/.terraform/
 
 #.env file
 backend/.env
+
+.env

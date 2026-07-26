@@ -1,0 +1,97 @@
+#Specifies the Docker Compose file format version
+version: '3.8'
+
+services:
+
+  # PostgreSQL database
+  db:
+    #Uses official PostgreSQL 16 image
+    image: postgres:16-alpine
+    container_name: cloudport-db
+    #Sets up the database on first run, DB_PASSWORD pulls the value from a .env file
+    #in the same directory, same pattern as the backend .env. The actual password is hardcoded in the compose file
+    environment:
+      - POSTGRES_DB=cloudport
+      - POSTGRES_USER=cloudport_user
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      # Persist database data between container restarts
+      - db_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    #This chechs if PostgreSQL is ready to accept connections, other services that depend on the database
+    #Won't start until this check passes, preventing the API from starting before the database is ready
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cloudport_user -d cloudport"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # FastAPI backend
+  cloudport-api:
+    #Instead of a pre-built image, Docker will build the image from the Dockerfile from the /backend directory
+    #Due to this, code changes made will be picked up when rebuilt
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cloudport-api
+    environment:
+      - DATABASE_URL=postgresql://cloudport_user:${DB_PASSWORD}@db:5432/cloudport
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING}
+      - AZURE_STORAGE_ACCOUNT_NAME=${AZURE_STORAGE_ACCOUNT_NAME}
+      - QUARANTINE_CONTAINER_NAME=quarantine
+      - PRODUCTION_CONTAINER_NAME=production
+      - SECRET_KEY=${SECRET_KEY}
+    #The API will only start after the database passes the health check,
+    #service_healthy is used [instead of the usual service_started] since it's more reliable since
+    #it waits for PostgreSQL to actually be ready, not just running
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    ports:
+      # Expose API internally only — Nginx handles external traffic
+      - "8000:8000"
+
+  # ClamAV malware scanner
+  clamav:
+    #Uses the official stable ClamAV Docker image
+    image: clamav/clamav:stable
+    container_name: cloudport-clamav
+    volumes:
+      # Persist virus definitions between restarts so re-download isn't made every time
+      - clamav_data:/var/lib/clamav
+    restart: unless-stopped
+    #Checks every minute if ClamAV is up and running correctly
+    #[it's less frequent than the database's health check since ClamAV's start up takes longer while it loads virus definitions]
+    healthcheck:
+      test: ["CMD", "clamdcheck.sh"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+
+  # Jellyfin media server
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: cloudport-jellyfin
+    environment:
+      - JELLYFIN_ADMIN_USERNAME=${JELLYFIN_ADMIN_USERNAME}
+      - JELLYFIN_ADMIN_PASSWORD=${JELLYFIN_ADMIN_PASSWORD}
+    volumes:
+      # Jellyfin configuration. pre-seeded by our config files
+      - ./jellyfin/config:/config
+      # Jellyfin cache directory
+      - ./jellyfin/cache:/cache
+      # Media storage: where movies, TV shows, music directories are
+      - media_data:/media
+    ports:
+      # Port is exposed internally only, Nginx handles external routing
+      - "8096:8096"
+    restart: unless-stopped
+    depends_on:
+      - cloudport-api
+
+# Named volumes for persistent data storage
+volumes:
+  db_data:
+  clamav_data:
+  media_data:

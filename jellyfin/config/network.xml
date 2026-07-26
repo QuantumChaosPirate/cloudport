@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NetworkConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <!-- TLS termination is handles upstream by Nginx reverse proxy -->
+  <RequireHttps>false</RequireHttps>
+  <!-- Jellyfin HTTP listener port inside the Docker network -->
+  <HttpServerPortNumber>8096</HttpServerPortNumber>
+  <!-- Jellyfin native HTTPS port - unused, TLS handled by Nginx -->
+  <HttpsPortNumber>8920</HttpsPortNumber>
+  <!-- Disable native TLS- Nginz handles SSL termination-->
+  <EnableHttps>false</EnableHttps>
+  <!-- Disable automatic port mapping, handled via Docker -->
+  <EnableUPnP>false</EnableUPnP>
+  <!-- Allow all local IPs since it's running in Docker -->
+  <LocalNetworkSubnets />
+  <LocalNetworkAddresses />
+  <!-- Enables remote access, required for external connections over the internet -->
+  <EnableRemoteAccess>true</EnableRemoteAccess>
+  <!-- IPV6 disabled, VM configure for IPV4 only -->
+  <EnableIPV6>false</EnableIPV6>
+
+</NetworkConfiguration>
+<!-- Most network conditions are outsorced to Nginx or Docker, bare minimum handled by Jellyfin -->

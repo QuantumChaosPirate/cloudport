@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ServerConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <!-- Unique server name is displayed in Jellyfin clients -->
+  <ServerName>CloudPort Media</ServerName>
+
+  <!-- The Jellyfin setup wizard is disabled, the CloudPort wizard handles initial setup instead -->
+  <IsStartupWizardCompleted>true</IsStartupWizardCompleted>
+
+  <!-- Cache directory inside the container for transcoding and image cache -->
+  <CachePath>/cache</CachePath>
+
+  <!-- Metadata language and country settings -->
+  <PreferredMetadataLanguage>en</PreferredMetadataLanguage>
+  <MetadataCountryCode>US</MetadataCountryCode>
+
+  <!-- Disabled automatic port mapping, port assignments are all handled by Docker -->
+  <AutoDiscovery>false</AutoDiscovery>
+
+  <!-- Allow clients to remotely control the media playback -->
+  <EnableRemoteControlOfOtherUsers>false</EnableRemoteControlOfOtherUsers>
+
+  <!-- Disabled the crash reporting to external servers, in order to keep user data private -->
+  <EnableCrashReport>false</EnableCrashReport>
+
+  <!-- Disabled automatic plugin updates, updates are handled through CloudPort update process -->
+  <EnableAutoUpdate>false</EnableAutoUpdate>
+
+  <!-- Log file retention, keeps only 3 days of logs to save disk space -->
+  <LogFileRetentionDays>3</LogFileRetentionDays>
+
+  <!-- Enabled detailed activity logging for CloudPort monitoring integration -->
+  <EnableActivityLogCleanup>true</EnableActivityLogCleanup>
+  <ActivityLogRetentionDays>30</ActivityLogRetentionDays>
+
+</ServerConfiguration>
+
+<!-- The system's components are outsorced to the Cloudport's main system componenets -->

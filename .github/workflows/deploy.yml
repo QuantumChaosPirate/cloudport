@@ -1,0 +1,32 @@
+name: CloudPort Deploy
+
+# Run on every push to main
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out the code
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # SSH into the VM and pull latest changes
+      #Uses a community GitHub Action called [appleboy/ssh-action] that SSHs into a remote server
+      #and runs commands
+      - name: Deploy to Azure VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: cloudport
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /cloudport
+            git pull origin main
+            docker compose build cloudport-api
+            docker compose up -d
+            docker compose run --rm cloudport-api alembic upgrade head
+            echo "Deployment complete"

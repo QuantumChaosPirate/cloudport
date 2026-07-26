@@ -1,0 +1,68 @@
+name: CloudPort CI
+
+# Run on every pull request to main
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    #GitHub Actions can spin up Docker containers alongside the services.
+    #It starts a real PostgreSQL database for the tests to use. It's a seperate test database
+    #sp tests never touch your real data. The health-cmd options make the runner wait until
+    #PostgreSQL is actually ready before running any steps
+    services:
+      # Spin up a PostgreSQL container for testing
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: cloudport_test
+          POSTGRES_USER: cloudport_user
+          POSTGRES_PASSWORD: testpassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      # Check out the code, downloads the repo code onto the runner
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+
+      # Run database migrations
+      - name: Run migrations
+        env:
+          DATABASE_URL: postgresql://cloudport_user:testpassword@localhost:5432/cloudport_test
+          AZURE_STORAGE_CONNECTION_STRING: dummy
+          AZURE_STORAGE_ACCOUNT_NAME: dummy
+        run: |
+          cd backend
+          alembic upgrade head
+
+      # Run tests
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://cloudport_user:testpassword@localhost:5432/cloudport_test
+          AZURE_STORAGE_CONNECTION_STRING: dummy
+          AZURE_STORAGE_ACCOUNT_NAME: dummy
+          SECRET_KEY: testsecretkey
+        run: |
+          cd backend
+          pip install pytest pytest-asyncio httpx
+          pytest tests/ -v
